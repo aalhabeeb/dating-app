@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#FF4458">
+  <title>FlameDate</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<div class="app" id="app">
+
+  <!-- ════ AUTH SCREEN ════ -->
+  <div class="screen auth-screen active" id="authScreen">
+    <div class="auth-logo">🔥 FlameDate</div>
+    <div class="auth-tagline">Ontmoet iemand bijzonders</div>
+    <div class="auth-card">
+      <div class="auth-tabs">
+        <button class="auth-tab active" onclick="switchAuthTab('login')">Inloggen</button>
+        <button class="auth-tab" onclick="switchAuthTab('register')">Registreren</button>
+      </div>
+      <div class="error-msg" id="authError"></div>
+
+      <!-- Login -->
+      <form id="loginForm" onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label>E-mailadres</label>
+          <input type="email" id="loginEmail" placeholder="jouw@email.nl" required>
+        </div>
+        <div class="form-group">
+          <label>Wachtwoord</label>
+          <input type="password" id="loginPassword" placeholder="••••••••" required minlength="8">
+        </div>
+        <button type="submit" class="btn btn-primary">Inloggen</button>
+      </form>
+
+      <!-- Register -->
+      <form id="registerForm" style="display:none" onsubmit="handleRegister(event)">
+        <div class="form-group">
+          <label>E-mailadres</label>
+          <input type="email" id="regEmail" placeholder="jouw@email.nl" required>
+        </div>
+        <div class="form-group">
+          <label>Wachtwoord</label>
+          <input type="password" id="regPassword" placeholder="Min. 8 karakters" required minlength="8">
+        </div>
+        <button type="submit" class="btn btn-primary">Account aanmaken</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ════ PROFILE SETUP ════ -->
+  <div class="screen setup-screen" id="setupScreen">
+    <h2>Maak je profiel</h2>
+    <p>Vertel iets over jezelf zodat anderen je kunnen leren kennen</p>
+    <form id="setupForm" onsubmit="handleSetup(event)">
+      <div class="error-msg" id="setupError"></div>
+      <div class="form-group">
+        <label>Naam</label>
+        <input type="text" id="setupName" placeholder="Hoe noem je jezelf?" required maxlength="100">
+      </div>
+      <div class="form-group">
+        <label>Leeftijd</label>
+        <input type="number" id="setupAge" placeholder="25" required min="18" max="120">
+      </div>
+      <div class="form-group">
+        <label>Geslacht</label>
+        <select id="setupGender" required>
+          <option value="">Selecteer...</option>
+          <option value="male">Man</option>
+          <option value="female">Vrouw</option>
+          <option value="non_binary">Non-binair</option>
+          <option value="other">Anders</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Stad</label>
+        <input type="text" id="setupCity" placeholder="Amsterdam" maxlength="100">
+      </div>
+      <div class="form-group">
+        <label>Over mij</label>
+        <textarea id="setupBio" placeholder="Vertel iets leuks over jezelf..." maxlength="2000"></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary">🔥 Start met swipen</button>
+    </form>
+  </div>
+
+  <!-- ════ MAIN APP (Cards) ════ -->
+  <div class="screen" id="mainScreen">
+    <div class="header">
+      <div class="logo">🔥 FlameDate</div>
+    </div>
+
+    <div class="cards-container" id="cardsContainer">
+      <div class="card-stack" id="cardStack"></div>
+      <div class="no-more-cards" id="noCards" style="display:none">
+        <div class="emoji">🔍</div>
+        <h3>Geen profielen meer</h3>
+        <p>Check later nog eens voor nieuwe mensen!</p>
+      </div>
+    </div>
+
+    <div class="swipe-actions" id="swipeActions">
+      <button class="swipe-btn nope" onclick="swipeButton('dislike')">✕</button>
+      <button class="swipe-btn like" onclick="swipeButton('like')">♥</button>
+    </div>
+
+    <nav class="bottom-nav">
+      <button class="nav-item active" onclick="showScreen('main')">
+        <span class="icon">🔥</span>
+        Ontdek
+      </button>
+      <button class="nav-item" onclick="showScreen('matches')">
+        <span class="icon">💬</span>
+        Matches
+      </button>
+      <button class="nav-item" onclick="showScreen('profile')">
+        <span class="icon">👤</span>
+        Profiel
+      </button>
+    </nav>
+  </div>
+
+  <!-- ════ MATCHES SCREEN ════ -->
+  <div class="screen matches-screen" id="matchesScreen">
+    <div class="header">
+      <div class="logo">💬 Matches</div>
+    </div>
+    <div class="matches-header">Jouw <span>Matches</span></div>
+    <div class="match-list" id="matchList"></div>
+    <nav class="bottom-nav">
+      <button class="nav-item" onclick="showScreen('main')">
+        <span class="icon">🔥</span>
+        Ontdek
+      </button>
+      <button class="nav-item active" onclick="showScreen('matches')">
+        <span class="icon">💬</span>
+        Matches
+      </button>
+      <button class="nav-item" onclick="showScreen('profile')">
+        <span class="icon">👤</span>
+        Profiel
+      </button>
+    </nav>
+  </div>
+
+  <!-- ════ PROFILE SCREEN ════ -->
+  <div class="screen profile-screen" id="profileScreen">
+    <div class="header">
+      <div class="logo">👤 Profiel</div>
+    </div>
+    <div class="profile-card" id="profileCard"></div>
+    <button class="btn-logout" onclick="logout()">Uitloggen</button>
+    <div style="height:100px"></div>
+    <nav class="bottom-nav">
+      <button class="nav-item" onclick="showScreen('main')">
+        <span class="icon">🔥</span>
+        Ontdek
+      </button>
+      <button class="nav-item" onclick="showScreen('matches')">
+        <span class="icon">💬</span>
+        Matches
+      </button>
+      <button class="nav-item active" onclick="showScreen('profile')">
+        <span class="icon">👤</span>
+        Profiel
+      </button>
+    </nav>
+  </div>
+
+  <!-- ════ MATCH POPUP ════ -->
+  <div class="match-popup" id="matchPopup">
+    <div class="match-popup-content">
+      <h2>It's a Match! 🎉</h2>
+      <p id="matchName">Jullie vinden elkaar leuk!</p>
+      <button class="btn btn-primary" onclick="closeMatchPopup()">Verder swipen</button>
+    </div>
+  </div>
+
+</div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>
