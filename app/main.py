@@ -23,8 +23,8 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title="Dating App API",
-    description="Een dating app API met profielen, swipen en matches",
+    title="MandaeanDate API",
+    description="MandaeanDate - Een dating app voor de Mandaeaanse gemeenschap",
     version="1.0.0",
     lifespan=lifespan,
 )

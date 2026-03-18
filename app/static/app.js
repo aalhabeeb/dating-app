@@ -1,4 +1,4 @@
-/* ── FlameDate - Tinder-style Dating App ── */
+/* ── MandaeanDate - Tinder-style Dating App ── */
 
 const API = '';
 let token = localStorage.getItem('token');
