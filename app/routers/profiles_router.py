@@ -4,11 +4,22 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from ..database import get_db
-from ..models import User, Profile
-from ..schemas import ProfileCreate, ProfileUpdate, ProfileOut
+from ..models import User, Profile, Photo
+from ..schemas import ProfileCreate, ProfileUpdate, ProfileOut, PhotoOut
 from ..auth import get_current_user
 
 router = APIRouter(prefix="/api/profiles", tags=["profiles"])
+
+
+def _enrich_profile(profile: Profile) -> ProfileOut:
+    """Add photo URLs to a profile."""
+    photos = [
+        PhotoOut(id=p.id, filename=p.filename, url=f"/uploads/{p.filename}", position=p.position)
+        for p in (profile.photos or [])
+    ]
+    out = ProfileOut.model_validate(profile)
+    out.photos = photos
+    return out
 
 
 @router.post("/", response_model=ProfileOut, status_code=status.HTTP_201_CREATED)
@@ -24,7 +35,7 @@ def create_profile(
     db.add(profile)
     db.commit()
     db.refresh(profile)
-    return profile
+    return _enrich_profile(profile)
 
 
 @router.get("/me", response_model=ProfileOut)
@@ -35,7 +46,7 @@ def get_my_profile(
     profile = db.query(Profile).filter(Profile.user_id == current_user.id).first()
     if not profile:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Profiel niet gevonden")
-    return profile
+    return _enrich_profile(profile)
 
 
 @router.patch("/me", response_model=ProfileOut)
@@ -53,7 +64,7 @@ def update_my_profile(
 
     db.commit()
     db.refresh(profile)
-    return profile
+    return _enrich_profile(profile)
 
 
 @router.get("/{profile_id}", response_model=ProfileOut)
@@ -65,7 +76,7 @@ def get_profile(
     profile = db.query(Profile).filter(Profile.id == profile_id).first()
     if not profile:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Profiel niet gevonden")
-    return profile
+    return _enrich_profile(profile)
 
 
 @router.get("/", response_model=list[ProfileOut])
@@ -94,4 +105,4 @@ def discover(
         .limit(limit)
         .all()
     )
-    return profiles
+    return [_enrich_profile(p) for p in profiles]

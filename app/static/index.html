@@ -56,6 +56,19 @@
     <p>Vertel iets over jezelf zodat anderen je kunnen leren kennen</p>
     <form id="setupForm" onsubmit="handleSetup(event)">
       <div class="error-msg" id="setupError"></div>
+
+      <div class="form-group">
+        <label>Foto's (minimaal 2, maximaal 6)</label>
+        <div class="photo-grid" id="setupPhotoGrid">
+          <label class="photo-slot add-photo">
+            <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" hidden onchange="addSetupPhoto(this)">
+            <span class="plus">+</span>
+            <span class="photo-label">Voeg foto toe</span>
+          </label>
+        </div>
+        <div class="photo-count" id="photoCount">0 / 6 foto's (minimaal 2)</div>
+      </div>
+
       <div class="form-group">
         <label>Naam</label>
         <input type="text" id="setupName" placeholder="Hoe noem je jezelf?" required maxlength="100">

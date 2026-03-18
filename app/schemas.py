@@ -50,7 +50,18 @@ class ProfileOut(BaseModel):
     bio: str
     photo_url: str
     city: str
+    photos: list["PhotoOut"] = []
     updated_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
+# ── Photos ────────────────────────────────────────────
+class PhotoOut(BaseModel):
+    id: UUID
+    filename: str
+    url: str = ""
+    position: int
 
     model_config = {"from_attributes": True}
 

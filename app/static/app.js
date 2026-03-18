@@ -5,6 +5,7 @@ let token = localStorage.getItem('token');
 let currentUser = null;
 let profiles = [];
 let currentCardIndex = 0;
+let setupPhotos = []; // Files queued during profile setup
 
 // ── Color palette for profile avatars ──
 const COLORS = [
@@ -41,6 +42,17 @@ async function apiForm(path, body) {
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.detail || 'Er ging iets mis');
+  return data;
+}
+
+async function apiUpload(path, file) {
+  const headers = {};
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+  const form = new FormData();
+  form.append('file', file);
+  const res = await fetch(`${API}${path}`, { method: 'POST', headers, body: form });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.detail || 'Upload mislukt');
   return data;
 }
 
@@ -104,6 +116,59 @@ function logout() {
 }
 
 // ══════════════════════════════════════════
+//  PHOTO UPLOAD (Setup)
+// ══════════════════════════════════════════
+
+function addSetupPhoto(input) {
+  if (!input.files || !input.files[0]) return;
+  if (setupPhotos.length >= 6) return;
+
+  const file = input.files[0];
+  if (file.size > 10 * 1024 * 1024) { alert('Bestand mag max 10 MB zijn'); return; }
+
+  setupPhotos.push(file);
+  renderSetupPhotos();
+  input.value = '';
+}
+
+function removeSetupPhoto(index) {
+  setupPhotos.splice(index, 1);
+  renderSetupPhotos();
+}
+
+function renderSetupPhotos() {
+  const grid = document.getElementById('setupPhotoGrid');
+  const countEl = document.getElementById('photoCount');
+
+  grid.innerHTML = '';
+
+  setupPhotos.forEach((file, i) => {
+    const slot = document.createElement('div');
+    slot.className = 'photo-slot filled';
+    const img = document.createElement('img');
+    img.src = URL.createObjectURL(file);
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'photo-remove';
+    btn.textContent = '✕';
+    btn.onclick = () => removeSetupPhoto(i);
+    slot.appendChild(img);
+    slot.appendChild(btn);
+    grid.appendChild(slot);
+  });
+
+  if (setupPhotos.length < 6) {
+    const addSlot = document.createElement('label');
+    addSlot.className = 'photo-slot add-photo';
+    addSlot.innerHTML = `<input type="file" accept="image/jpeg,image/png,image/webp,image/gif" hidden onchange="addSetupPhoto(this)"><span class="plus">+</span><span class="photo-label">Voeg toe</span>`;
+    grid.appendChild(addSlot);
+  }
+
+  countEl.textContent = `${setupPhotos.length} / 6 foto's (minimaal 2)`;
+  countEl.className = 'photo-count ' + (setupPhotos.length >= 2 ? 'valid' : 'invalid');
+}
+
+// ══════════════════════════════════════════
 //  PROFILE SETUP
 // ══════════════════════════════════════════
 
@@ -111,6 +176,13 @@ async function handleSetup(e) {
   e.preventDefault();
   const errEl = document.getElementById('setupError');
   errEl.classList.remove('show');
+
+  if (setupPhotos.length < 2) {
+    errEl.textContent = 'Upload minimaal 2 foto\'s';
+    errEl.classList.add('show');
+    return;
+  }
+
   try {
     await api('/api/profiles/', {
       method: 'POST',
@@ -122,6 +194,13 @@ async function handleSetup(e) {
         bio: document.getElementById('setupBio').value,
       }),
     });
+
+    // Upload photos
+    for (const file of setupPhotos) {
+      await apiUpload('/api/photos/', file);
+    }
+    setupPhotos = [];
+
     await loadApp();
   } catch (err) {
     errEl.textContent = err.message;
@@ -195,19 +274,44 @@ function createCard(profile, isTop, stackIndex) {
 
   const [c1, c2] = getColor(profile.display_name);
   const initial = (profile.display_name || '?')[0].toUpperCase();
+  const photos = profile.photos || [];
+  const hasPhotos = photos.length > 0;
+
+  let photoHTML;
+  if (hasPhotos) {
+    const dots = photos.map((_, i) => `<div class="photo-dot${i === 0 ? ' active' : ''}" data-i="${i}"></div>`).join('');
+    photoHTML = `
+      <div class="card-photo">
+        <img src="${photos[0].url}" alt="${esc(profile.display_name)}" data-photos='${JSON.stringify(photos.map(p=>p.url))}' data-current="0">
+        ${photos.length > 1 ? `
+          <div class="photo-dots">${dots}</div>
+          <div class="photo-nav prev" onclick="cardPhotoNav(this, -1)"></div>
+          <div class="photo-nav next" onclick="cardPhotoNav(this, 1)"></div>
+        ` : ''}
+        <div class="card-gradient"></div>
+        <div class="card-info">
+          <h3>${esc(profile.display_name)} <span>${profile.age}</span></h3>
+          ${profile.city ? `<div class="city">📍 ${esc(profile.city)}</div>` : ''}
+          ${profile.bio ? `<div class="bio">${esc(profile.bio)}</div>` : ''}
+        </div>
+      </div>
+    `;
+  } else {
+    photoHTML = `
+      <div class="card-photo" style="background:linear-gradient(135deg,${c1},${c2})">
+        <span class="initial">${initial}</span>
+        <div class="card-gradient"></div>
+        <div class="card-info">
+          <h3>${esc(profile.display_name)} <span>${profile.age}</span></h3>
+          ${profile.city ? `<div class="city">📍 ${esc(profile.city)}</div>` : ''}
+          ${profile.bio ? `<div class="bio">${esc(profile.bio)}</div>` : ''}
+        </div>
+      </div>
+    `;
+  }
 
   card.innerHTML = `
-    <div class="card-photo" style="background:linear-gradient(135deg,${c1},${c2})">
-      ${profile.photo_url
-        ? `<img src="${profile.photo_url}" alt="${profile.display_name}" onerror="this.remove()">`
-        : `<span class="initial">${initial}</span>`}
-      <div class="card-gradient"></div>
-      <div class="card-info">
-        <h3>${esc(profile.display_name)} <span>${profile.age}</span></h3>
-        ${profile.city ? `<div class="city">📍 ${esc(profile.city)}</div>` : ''}
-        ${profile.bio ? `<div class="bio">${esc(profile.bio)}</div>` : ''}
-      </div>
-    </div>
+    ${photoHTML}
     <div class="card-stamp like">LIKE</div>
     <div class="card-stamp nope">NOPE</div>
   `;
@@ -216,6 +320,17 @@ function createCard(profile, isTop, stackIndex) {
 
   if (isTop) initSwipeGesture(card);
   return card;
+}
+
+function cardPhotoNav(navEl, dir) {
+  const cardPhoto = navEl.closest('.card-photo');
+  const img = cardPhoto.querySelector('img');
+  const photos = JSON.parse(img.dataset.photos);
+  let current = parseInt(img.dataset.current);
+  current = Math.max(0, Math.min(photos.length - 1, current + dir));
+  img.src = photos[current];
+  img.dataset.current = current;
+  cardPhoto.querySelectorAll('.photo-dot').forEach((d, i) => d.classList.toggle('active', i === current));
 }
 
 function initSwipeGesture(card) {
@@ -361,17 +476,62 @@ function renderProfile() {
   const [c1, c2] = getColor(p.display_name);
   const initial = (p.display_name || '?')[0].toUpperCase();
   const genderLabel = {male:'Man', female:'Vrouw', non_binary:'Non-binair', other:'Anders'}[p.gender] || p.gender;
+  const photos = p.photos || [];
+
+  let headerHTML;
+  if (photos.length > 0) {
+    headerHTML = `<div class="profile-photo"><img src="${photos[0].url}" style="width:100%;height:100%;object-fit:cover"></div>`;
+  } else {
+    headerHTML = `<div class="profile-photo" style="background:linear-gradient(135deg,${c1},${c2})">${initial}</div>`;
+  }
+
+  const photosGridHTML = photos.map(ph => `
+    <div class="photo-thumb">
+      <img src="${ph.url}" alt="">
+      <button class="photo-remove" onclick="deleteProfilePhoto('${ph.id}')">✕</button>
+    </div>
+  `).join('');
+
+  const addPhotoHTML = photos.length < 6 ? `
+    <label class="profile-add-photo">
+      <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" hidden onchange="uploadProfilePhoto(this)">
+      +
+    </label>
+  ` : '';
 
   card.innerHTML = `
-    <div class="profile-photo" style="background:linear-gradient(135deg,${c1},${c2})">
-      ${initial}
-    </div>
+    ${headerHTML}
     <div class="profile-details">
       <h2>${esc(p.display_name)}, ${p.age}</h2>
       <div class="meta">${genderLabel}${p.city ? ' · 📍 ' + esc(p.city) : ''}</div>
       ${p.bio ? `<div class="bio-text">${esc(p.bio)}</div>` : ''}
     </div>
+    <div class="profile-photos-grid">
+      ${photosGridHTML}
+      ${addPhotoHTML}
+    </div>
   `;
+}
+
+async function uploadProfilePhoto(input) {
+  if (!input.files || !input.files[0]) return;
+  try {
+    await apiUpload('/api/photos/', input.files[0]);
+    currentUser = await api('/api/profiles/me');
+    renderProfile();
+  } catch (err) { alert(err.message); }
+}
+
+async function deleteProfilePhoto(photoId) {
+  if (!confirm('Foto verwijderen?')) return;
+  try {
+    const headers = {};
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+    const res = await fetch(`/api/photos/${photoId}`, { method: 'DELETE', headers });
+    if (!res.ok) { const d = await res.json(); throw new Error(d.detail); }
+    currentUser = await api('/api/profiles/me');
+    renderProfile();
+  } catch (err) { alert(err.message); }
 }
 
 // ══════════════════════════════════════════

@@ -213,6 +213,94 @@ body {
 .avatar-upload:hover { border-color: var(--primary); }
 .avatar-upload img { width: 100%; height: 100%; object-fit: cover; }
 
+/* ── Photo Grid (Setup) ──────────────────── */
+.photo-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.photo-slot {
+  aspect-ratio: 3/4;
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+}
+.photo-slot.add-photo {
+  border: 2px dashed #D1D1D6;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  transition: border-color 0.3s, background 0.3s;
+}
+.photo-slot.add-photo:hover { border-color: var(--primary); background: rgba(255,68,88,0.04); }
+.photo-slot .plus { font-size: 28px; color: var(--primary); font-weight: 300; }
+.photo-slot .photo-label { font-size: 11px; color: var(--text-light); }
+.photo-slot.filled img { width: 100%; height: 100%; object-fit: cover; }
+.photo-slot .photo-remove {
+  position: absolute; top: 4px; right: 4px;
+  width: 24px; height: 24px; border-radius: 50%;
+  background: rgba(0,0,0,0.6); color: white;
+  border: none; font-size: 14px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+}
+.photo-count { font-size: 12px; color: var(--text-light); }
+.photo-count.valid { color: var(--success); }
+.photo-count.invalid { color: var(--danger); }
+
+/* ── Photo Carousel (Cards) ──────────────── */
+.card-photo { position: relative; }
+.card-photo .photo-dots {
+  position: absolute; top: 8px; left: 8px; right: 8px;
+  display: flex; gap: 4px; z-index: 5;
+}
+.card-photo .photo-dot {
+  flex: 1; height: 3px; border-radius: 2px;
+  background: rgba(255,255,255,0.4);
+  transition: background 0.3s;
+}
+.card-photo .photo-dot.active { background: rgba(255,255,255,0.95); }
+.card-photo .photo-nav {
+  position: absolute; top: 0; bottom: 30%; z-index: 4;
+  width: 50%; cursor: pointer;
+}
+.card-photo .photo-nav.prev { left: 0; }
+.card-photo .photo-nav.next { right: 0; }
+
+/* ── Profile Photos ──────────────────────── */
+.profile-photos-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  padding: 16px;
+}
+.profile-photos-grid .photo-thumb {
+  aspect-ratio: 3/4;
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+}
+.profile-photos-grid .photo-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.profile-photos-grid .photo-thumb .photo-remove {
+  position: absolute; top: 4px; right: 4px;
+  width: 22px; height: 22px; border-radius: 50%;
+  background: rgba(0,0,0,0.6); color: white;
+  border: none; font-size: 12px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+}
+.profile-add-photo {
+  aspect-ratio: 3/4;
+  border: 2px dashed #D1D1D6;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px; color: var(--text-light);
+  cursor: pointer; transition: border-color 0.3s;
+}
+.profile-add-photo:hover { border-color: var(--primary); }
+
 /* ── Swipe Cards ──────────────────────────── */
 .cards-container {
   flex: 1;

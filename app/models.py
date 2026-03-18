@@ -61,6 +61,19 @@ class Profile(Base):
     updated_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 
     user = relationship("User", back_populates="profile")
+    photos = relationship("Photo", back_populates="profile", cascade="all, delete-orphan", order_by="Photo.position")
+
+
+class Photo(Base):
+    __tablename__ = "photos"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    profile_id = Column(UUID(as_uuid=True), ForeignKey("profiles.id", ondelete="CASCADE"), nullable=False, index=True)
+    filename = Column(String(500), nullable=False)
+    position = Column(Integer, nullable=False, default=0)
+    created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
+
+    profile = relationship("Profile", back_populates="photos")
 
 
 class Swipe(Base):

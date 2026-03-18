@@ -7,9 +7,12 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from .database import engine, Base
-from .routers import auth_router, profiles_router, matches_router, admin_router
+import os
+
+from .routers import auth_router, profiles_router, matches_router, admin_router, photos_router
 
 STATIC_DIR = pathlib.Path(__file__).parent / "static"
+UPLOAD_DIR = pathlib.Path(os.getenv("UPLOAD_DIR", "/uploads"))
 
 
 @asynccontextmanager
@@ -38,7 +41,10 @@ app.include_router(auth_router.router)
 app.include_router(profiles_router.router)
 app.include_router(matches_router.router)
 app.include_router(admin_router.router)
+app.include_router(photos_router.router)
 
+UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 
