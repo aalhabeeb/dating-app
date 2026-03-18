@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FlameDate Admin</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100vh; }
+
+    .login-page { display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+    .login-box { background: #1e293b; border-radius: 16px; padding: 40px; width: 100%; max-width: 400px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); }
+    .login-box h1 { font-size: 24px; margin-bottom: 8px; }
+    .login-box h1 span { color: #f43f5e; }
+    .login-box p { color: #94a3b8; font-size: 14px; margin-bottom: 24px; }
+
+    .sidebar { width: 240px; background: #1e293b; height: 100vh; position: fixed; left: 0; top: 0; padding: 20px 0; }
+    .sidebar .brand { padding: 0 20px 20px; font-size: 20px; font-weight: 800; border-bottom: 1px solid #334155; margin-bottom: 12px; }
+    .sidebar .brand span { color: #f43f5e; }
+    .sidebar a { display: flex; align-items: center; gap: 10px; padding: 12px 20px; color: #94a3b8; text-decoration: none; font-size: 14px; font-weight: 500; transition: all 0.2s; }
+    .sidebar a:hover, .sidebar a.active { color: #f1f5f9; background: #334155; }
+    .sidebar a .icon { font-size: 18px; width: 24px; text-align: center; }
+
+    .main { margin-left: 240px; padding: 24px 32px; }
+    .main h2 { font-size: 22px; font-weight: 700; margin-bottom: 20px; }
+
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 32px; }
+    .stat-card { background: #1e293b; border-radius: 12px; padding: 20px; }
+    .stat-card .label { font-size: 13px; color: #94a3b8; margin-bottom: 4px; }
+    .stat-card .value { font-size: 32px; font-weight: 800; }
+    .stat-card .value.pink { color: #f43f5e; }
+    .stat-card .value.green { color: #22c55e; }
+    .stat-card .value.blue { color: #3b82f6; }
+    .stat-card .value.gold { color: #eab308; }
+
+    table { width: 100%; border-collapse: collapse; background: #1e293b; border-radius: 12px; overflow: hidden; }
+    thead th { text-align: left; padding: 14px 16px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8; background: #0f172a; border-bottom: 1px solid #334155; }
+    tbody td { padding: 12px 16px; font-size: 14px; border-bottom: 1px solid #1e293b; }
+    tbody tr { transition: background 0.2s; }
+    tbody tr:hover { background: #334155; }
+
+    .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+    .badge-green { background: rgba(34,197,94,0.15); color: #22c55e; }
+    .badge-gray { background: rgba(148,163,184,0.15); color: #94a3b8; }
+
+    .btn-delete { background: none; border: 1px solid #ef4444; color: #ef4444; padding: 6px 14px; border-radius: 8px; font-size: 13px; cursor: pointer; transition: all 0.2s; }
+    .btn-delete:hover { background: #ef4444; color: white; }
+
+    input, button { font-family: inherit; }
+    .form-input { width: 100%; padding: 12px 14px; background: #0f172a; border: 1px solid #334155; border-radius: 10px; color: #e2e8f0; font-size: 15px; margin-bottom: 12px; outline: none; }
+    .form-input:focus { border-color: #f43f5e; }
+    .btn-login { width: 100%; padding: 14px; background: linear-gradient(135deg, #f43f5e, #ec4899); color: white; border: none; border-radius: 10px; font-size: 15px; font-weight: 700; cursor: pointer; }
+    .btn-login:hover { opacity: 0.9; }
+    .error { background: rgba(239,68,68,0.15); color: #ef4444; padding: 10px 14px; border-radius: 8px; font-size: 13px; margin-bottom: 12px; display: none; }
+    .error.show { display: block; }
+
+    .tab-section { display: none; }
+    .tab-section.active { display: block; }
+
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      .main { margin-left: 0; padding: 16px; }
+      .stats { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══ LOGIN ═══ -->
+<div class="login-page" id="loginPage">
+  <div class="login-box">
+    <h1>🔥 <span>FlameDate</span> Admin</h1>
+    <p>Log in met je admin account</p>
+    <div class="error" id="loginError"></div>
+    <form onsubmit="adminLogin(event)">
+      <input type="email" class="form-input" id="adminEmail" placeholder="E-mailadres" required>
+      <input type="password" class="form-input" id="adminPassword" placeholder="Wachtwoord" required>
+      <button type="submit" class="btn-login">Inloggen</button>
+    </form>
+  </div>
+</div>
+
+<!-- ═══ DASHBOARD ═══ -->
+<div id="dashboard" style="display:none">
+  <nav class="sidebar">
+    <div class="brand">🔥 <span>Admin</span></div>
+    <a href="#" class="active" onclick="switchTab('overview')"><span class="icon">📊</span> Overzicht</a>
+    <a href="#" onclick="switchTab('users')"><span class="icon">👥</span> Gebruikers</a>
+    <a href="#" onclick="switchTab('matches')"><span class="icon">💕</span> Matches</a>
+    <a href="#" onclick="adminLogout()" style="position:absolute;bottom:20px;left:0;right:0"><span class="icon">🚪</span> Uitloggen</a>
+  </nav>
+
+  <div class="main">
+    <!-- Overview -->
+    <div class="tab-section active" id="tab-overview">
+      <h2>📊 Dashboard</h2>
+      <div class="stats" id="statsGrid"></div>
+    </div>
+
+    <!-- Users -->
+    <div class="tab-section" id="tab-users">
+      <h2>👥 Gebruikers</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Naam</th>
+            <th>E-mail</th>
+            <th>Leeftijd</th>
+            <th>Stad</th>
+            <th>Swipes</th>
+            <th>Matches</th>
+            <th>Geregistreerd</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="usersTable"></tbody>
+      </table>
+    </div>
+
+    <!-- Matches -->
+    <div class="tab-section" id="tab-matches">
+      <h2>💕 Matches</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Persoon 1</th>
+            <th>Persoon 2</th>
+            <th>Datum</th>
+          </tr>
+        </thead>
+        <tbody id="matchesTable"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+let adminToken = localStorage.getItem('admin_token');
+
+async function adminApi(path, opts = {}) {
+  const headers = { 'Content-Type': 'application/json', ...opts.headers };
+  if (adminToken) headers['Authorization'] = `Bearer ${adminToken}`;
+  const res = await fetch(path, { ...opts, headers });
+  if (res.status === 403) { alert('Geen admin rechten'); adminLogout(); throw new Error('Forbidden'); }
+  if (res.status === 401) { adminLogout(); throw new Error('Sessie verlopen'); }
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.detail || 'Fout');
+  return data;
+}
+
+async function adminLogin(e) {
+  e.preventDefault();
+  const errEl = document.getElementById('loginError');
+  errEl.classList.remove('show');
+  try {
+    const res = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        username: document.getElementById('adminEmail').value,
+        password: document.getElementById('adminPassword').value,
+      }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || 'Fout');
+    adminToken = data.access_token;
+    localStorage.setItem('admin_token', adminToken);
+    await loadDashboard();
+  } catch (err) {
+    errEl.textContent = err.message;
+    errEl.classList.add('show');
+  }
+}
+
+function adminLogout() {
+  adminToken = null;
+  localStorage.removeItem('admin_token');
+  document.getElementById('loginPage').style.display = '';
+  document.getElementById('dashboard').style.display = 'none';
+}
+
+async function loadDashboard() {
+  try {
+    const stats = await adminApi('/api/admin/stats');
+    document.getElementById('loginPage').style.display = 'none';
+    document.getElementById('dashboard').style.display = '';
+
+    document.getElementById('statsGrid').innerHTML = `
+      <div class="stat-card"><div class="label">Gebruikers</div><div class="value blue">${stats.total_users}</div></div>
+      <div class="stat-card"><div class="label">Profielen</div><div class="value green">${stats.total_profiles}</div></div>
+      <div class="stat-card"><div class="label">Totaal Swipes</div><div class="value">${stats.total_swipes}</div></div>
+      <div class="stat-card"><div class="label">Likes</div><div class="value pink">${stats.total_likes}</div></div>
+      <div class="stat-card"><div class="label">Dislikes</div><div class="value">${stats.total_dislikes}</div></div>
+      <div class="stat-card"><div class="label">Matches</div><div class="value gold">${stats.total_matches}</div></div>
+    `;
+
+    await loadUsers();
+    await loadMatchesList();
+  } catch {
+    adminLogout();
+  }
+}
+
+async function loadUsers() {
+  try {
+    const users = await adminApi('/api/admin/users');
+    document.getElementById('usersTable').innerHTML = users.map(u => `
+      <tr>
+        <td>${u.profile ? esc(u.profile.display_name) : '<span class="badge badge-gray">Geen profiel</span>'}</td>
+        <td>${esc(u.email)}</td>
+        <td>${u.profile ? u.profile.age : '-'}</td>
+        <td>${u.profile?.city ? esc(u.profile.city) : '-'}</td>
+        <td>${u.swipes_given} / ${u.swipes_received}</td>
+        <td><span class="badge badge-green">${u.matches}</span></td>
+        <td>${u.created_at ? new Date(u.created_at).toLocaleDateString('nl') : '-'}</td>
+        <td><button class="btn-delete" onclick="deleteUser('${u.id}', '${esc(u.email)}')">Verwijder</button></td>
+      </tr>
+    `).join('');
+  } catch {}
+}
+
+async function loadMatchesList() {
+  try {
+    const matches = await adminApi('/api/admin/matches');
+    document.getElementById('matchesTable').innerHTML = matches.length > 0
+      ? matches.map(m => `
+        <tr>
+          <td>${esc(m.user1)}</td>
+          <td>${esc(m.user2)}</td>
+          <td>${m.created_at ? new Date(m.created_at).toLocaleDateString('nl') : '-'}</td>
+        </tr>
+      `).join('')
+      : '<tr><td colspan="3" style="text-align:center;padding:40px;color:#94a3b8">Nog geen matches</td></tr>';
+  } catch {}
+}
+
+async function deleteUser(id, email) {
+  if (!confirm(`Weet je zeker dat je ${email} wilt verwijderen?`)) return;
+  try {
+    await adminApi(`/api/admin/users/${id}`, { method: 'DELETE' });
+    await loadDashboard();
+  } catch (err) {
+    alert(err.message);
+  }
+}
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab-section').forEach(s => s.classList.remove('active'));
+  document.getElementById(`tab-${tab}`).classList.add('active');
+  document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+}
+
+function esc(s) { const d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML; }
+
+// Init
+if (adminToken) loadDashboard();
+</script>
+</body>
+</html>

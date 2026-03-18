@@ -7,7 +7,7 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from .database import engine, Base
-from .routers import auth_router, profiles_router, matches_router
+from .routers import auth_router, profiles_router, matches_router, admin_router
 
 STATIC_DIR = pathlib.Path(__file__).parent / "static"
 
@@ -37,6 +37,7 @@ app.add_middleware(
 app.include_router(auth_router.router)
 app.include_router(profiles_router.router)
 app.include_router(matches_router.router)
+app.include_router(admin_router.router)
 
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
@@ -49,3 +50,8 @@ def health():
 @app.get("/", include_in_schema=False)
 def root():
     return FileResponse(STATIC_DIR / "index.html")
+
+
+@app.get("/admin", include_in_schema=False)
+def admin_page():
+    return FileResponse(STATIC_DIR / "admin.html")
