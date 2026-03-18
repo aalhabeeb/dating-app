@@ -1,15 +1,107 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
-  <!-- Darfash - Mandaean religious banner/cross -->
-  <!-- Vertical pole -->
-  <rect x="47" y="5" width="6" height="90" rx="2" fill="currentColor"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 300" width="200" height="300">
+  <!-- Darfash / Dravsha - Mandaean sacred banner -->
+
+  <!-- Main vertical pole (staff) -->
+  <rect x="95" y="8" width="10" height="284" rx="4" fill="currentColor"/>
+
   <!-- Horizontal crossbar -->
-  <rect x="25" y="20" width="50" height="5" rx="2" fill="currentColor"/>
-  <!-- Draped cloth left -->
-  <path d="M25 22.5 Q20 35, 30 50 Q35 42, 35 30 Q33 26, 25 22.5Z" fill="currentColor" opacity="0.7"/>
-  <!-- Draped cloth right -->
-  <path d="M75 22.5 Q80 35, 70 50 Q65 42, 65 30 Q67 26, 75 22.5Z" fill="currentColor" opacity="0.7"/>
-  <!-- Myrtle branch left -->
-  <path d="M44 15 Q35 10, 28 12 Q32 14, 38 16 Q40 17, 44 15Z" fill="currentColor" opacity="0.5"/>
-  <!-- Myrtle branch right -->
-  <path d="M56 15 Q65 10, 72 12 Q68 14, 62 16 Q60 17, 56 15Z" fill="currentColor" opacity="0.5"/>
+  <rect x="40" y="52" width="120" height="8" rx="3" fill="currentColor"/>
+
+  <!-- Small knob/finial at top of pole -->
+  <circle cx="100" cy="8" r="6" fill="currentColor"/>
+
+  <!-- Draped silk cloth (pandama) - left side -->
+  <!-- Cloth hangs from the crossbar and drapes down in flowing curves -->
+  <path d="
+    M 42 52
+    C 38 52, 30 56, 26 66
+    C 22 78, 24 92, 30 106
+    C 34 116, 36 126, 34 138
+    C 32 150, 28 162, 30 174
+    C 32 184, 38 188, 42 186
+    C 46 184, 44 174, 42 164
+    C 40 152, 42 140, 46 128
+    C 50 116, 52 104, 48 92
+    C 44 80, 46 68, 52 60
+    C 56 56, 58 54, 60 52
+    L 42 52 Z
+  " fill="currentColor" opacity="0.55"/>
+
+  <!-- Draped silk cloth (pandama) - right side (mirrored) -->
+  <path d="
+    M 158 52
+    C 162 52, 170 56, 174 66
+    C 178 78, 176 92, 170 106
+    C 166 116, 164 126, 166 138
+    C 168 150, 172 162, 170 174
+    C 168 184, 162 188, 158 186
+    C 154 184, 156 174, 158 164
+    C 160 152, 158 140, 154 128
+    C 150 116, 148 104, 152 92
+    C 156 80, 154 68, 148 60
+    C 144 56, 142 54, 140 52
+    L 158 52 Z
+  " fill="currentColor" opacity="0.55"/>
+
+  <!-- Inner cloth detail - left (lighter layer to give depth) -->
+  <path d="
+    M 48 54
+    C 44 58, 38 68, 36 80
+    C 34 92, 38 104, 42 114
+    C 46 124, 44 136, 40 150
+    C 38 160, 40 170, 44 176
+    C 48 170, 48 158, 50 146
+    C 52 134, 54 120, 50 108
+    C 46 96, 46 82, 50 70
+    C 54 62, 56 56, 58 54
+    Z
+  " fill="currentColor" opacity="0.3"/>
+
+  <!-- Inner cloth detail - right (lighter layer) -->
+  <path d="
+    M 152 54
+    C 156 58, 162 68, 164 80
+    C 166 92, 162 104, 158 114
+    C 154 124, 156 136, 160 150
+    C 162 160, 160 170, 156 176
+    C 152 170, 152 158, 150 146
+    C 148 134, 146 120, 150 108
+    C 154 96, 154 82, 150 70
+    C 146 62, 144 56, 142 54
+    Z
+  " fill="currentColor" opacity="0.3"/>
+
+  <!-- Myrtle wreath at the junction (circle of leaves) -->
+  <circle cx="100" cy="56" r="14" fill="none" stroke="currentColor" stroke-width="3" opacity="0.7"/>
+
+  <!-- Myrtle leaves around the wreath - top -->
+  <ellipse cx="100" cy="40" rx="4" ry="7" fill="currentColor" opacity="0.5" transform="rotate(0,100,40)"/>
+  <!-- Myrtle leaves - top-right -->
+  <ellipse cx="112" cy="44" rx="4" ry="7" fill="currentColor" opacity="0.5" transform="rotate(45,112,44)"/>
+  <!-- Myrtle leaves - right -->
+  <ellipse cx="116" cy="56" rx="4" ry="7" fill="currentColor" opacity="0.5" transform="rotate(90,116,56)"/>
+  <!-- Myrtle leaves - bottom-right -->
+  <ellipse cx="112" cy="68" rx="4" ry="7" fill="currentColor" opacity="0.5" transform="rotate(135,112,68)"/>
+  <!-- Myrtle leaves - bottom -->
+  <ellipse cx="100" cy="72" rx="4" ry="7" fill="currentColor" opacity="0.5" transform="rotate(180,100,72)"/>
+  <!-- Myrtle leaves - bottom-left -->
+  <ellipse cx="88" cy="68" rx="4" ry="7" fill="currentColor" opacity="0.5" transform="rotate(225,88,68)"/>
+  <!-- Myrtle leaves - left -->
+  <ellipse cx="84" cy="56" rx="4" ry="7" fill="currentColor" opacity="0.5" transform="rotate(270,84,56)"/>
+  <!-- Myrtle leaves - top-left -->
+  <ellipse cx="88" cy="44" rx="4" ry="7" fill="currentColor" opacity="0.5" transform="rotate(315,88,44)"/>
+
+  <!-- Seven branches of myrtle on the crossbar (small upward twigs) -->
+  <!-- Left side twigs -->
+  <line x1="55" y1="52" x2="52" y2="38" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+  <line x1="68" y1="52" x2="66" y2="40" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+  <!-- Right side twigs -->
+  <line x1="132" y1="52" x2="134" y2="40" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+  <line x1="145" y1="52" x2="148" y2="38" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+
+  <!-- Small myrtle leaves on twigs -->
+  <ellipse cx="51" cy="36" rx="3" ry="5" fill="currentColor" opacity="0.45" transform="rotate(-10,51,36)"/>
+  <ellipse cx="65" cy="38" rx="3" ry="5" fill="currentColor" opacity="0.45" transform="rotate(-5,65,38)"/>
+  <ellipse cx="135" cy="38" rx="3" ry="5" fill="currentColor" opacity="0.45" transform="rotate(5,135,38)"/>
+  <ellipse cx="149" cy="36" rx="3" ry="5" fill="currentColor" opacity="0.45" transform="rotate(10,149,36)"/>
 </svg>
