@@ -3,10 +3,7 @@ name: Build & Push Docker Image
 on:
   push:
     branches: [master, main]
-    paths:
-      - "app/**"
-      - "Dockerfile"
-      - "requirements.txt"
+  workflow_dispatch:
 
 env:
   REGISTRY: ghcr.io
