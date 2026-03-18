@@ -1,0 +1,32 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: dating
+      POSTGRES_PASSWORD: dating      # Change in production!
+      POSTGRES_DB: datingapp
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dating -d datingapp"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  api:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://dating:dating@db:5432/datingapp
+      SECRET_KEY: change-me-use-openssl-rand-hex-32
+    ports:
+      - "8000:8000"
+
+volumes:
+  pgdata:
